@@ -246,6 +246,8 @@ func TestAdditionalISOs(t *testing.T) {
 
 }
 
+// FIXME Tests for Rng0
+
 func TestSerials(t *testing.T) {
 	serialsTest := []struct {
 		name          string

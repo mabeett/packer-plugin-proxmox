@@ -1,0 +1,27 @@
+<!-- Code generated from the comments of the rng0Config struct in builder/proxmox/common/config.go; DO NOT EDIT MANUALLY -->
+
+- `rng0` (object): Configure Random Number Generator via VirtIO.
+
+HCL2 example:
+
+```hcl
+rng0 {
+  source    = "/dev/urandom"
+  max_bytes = 1024
+  period    = 1000
+}
+```
+
+JSON example:
+
+```json
+{
+    "rng0": {
+        "source": "/dev/urandom",
+        "max_bytes": 1024,
+        "period": "1000
+    }
+}
+```
+
+<!-- End of code generated from the comments of the rng0Config struct in builder/proxmox/common/config.go; -->
