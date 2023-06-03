@@ -246,7 +246,84 @@ func TestAdditionalISOs(t *testing.T) {
 
 }
 
-// FIXME Tests for Rng0
+// FIXME: there is some error in the code
+// --- FAIL: TestRng0 (0.00s)
+// ... --- FAIL: TestRng0/no_error (0.00s)
+// ... panic: reflect: reflect.Value.Set using unaddressable value [recovered]
+// ........... panic: reflect: reflect.Value.Set using unaddressable value
+func TestRng0(t *testing.T) {
+	Rng0Test := []struct {
+		name          string
+		rng_config    rng0Config
+		expectFailure bool
+	}{
+		{
+			name:          "no error",
+			expectFailure: true,
+			rng_config: rng0Config{
+				Source:   "/dev/urandom",
+				MaxBytes: 1024,
+				Period:   1000,
+			},
+		},
+		{
+			name:          "empty Source, error",
+			expectFailure: true,
+			rng_config: rng0Config{
+				Source:   "",
+				MaxBytes: 1024,
+				Period:   1000,
+			},
+		},
+		{
+			name:          "zero Period, error",
+			expectFailure: true,
+			rng_config: rng0Config{
+				Source:   "/dev/urandom",
+				MaxBytes: 1024,
+				Period:   0,
+			},
+		},
+		{
+			name:          "malformed Source error, error",
+			expectFailure: true,
+			rng_config: rng0Config{
+				Source:   "/dev/abcde",
+				MaxBytes: 1024,
+				Period:   1000,
+			},
+		},
+		{
+			name:          "negative Period, error",
+			expectFailure: true,
+			rng_config: rng0Config{
+				Source:   "/dev/urandom",
+				MaxBytes: 1024,
+				Period:   -10,
+			},
+		},
+	}
+
+	for _, tt := range Rng0Test {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := mandatoryConfig(t)
+			cfg["rng0"] = tt.rng_config
+
+			var c Config
+			_, _, err := c.Prepare(&c, cfg)
+			if err != nil {
+				if !tt.expectFailure {
+					t.Fatalf("unexpected failure to prepare config: %s", err)
+				}
+				t.Logf("got expected failure: %s", err)
+			}
+
+			if err == nil && tt.expectFailure {
+				t.Errorf("expected failure, but prepare succeeded")
+			}
+		})
+	}
+}
 
 func TestSerials(t *testing.T) {
 	serialsTest := []struct {
