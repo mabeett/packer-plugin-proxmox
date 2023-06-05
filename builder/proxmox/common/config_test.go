@@ -246,11 +246,6 @@ func TestAdditionalISOs(t *testing.T) {
 
 }
 
-// FIXME: there is some error in the code
-// --- FAIL: TestRng0 (0.00s)
-// ... --- FAIL: TestRng0/no_error (0.00s)
-// ... panic: reflect: reflect.Value.Set using unaddressable value [recovered]
-// ........... panic: reflect: reflect.Value.Set using unaddressable value
 func TestRng0(t *testing.T) {
 	Rng0Test := []struct {
 		name          string
@@ -259,7 +254,7 @@ func TestRng0(t *testing.T) {
 	}{
 		{
 			name:          "no error",
-			expectFailure: true,
+			expectFailure: false,
 			rng_config: rng0Config{
 				Source:   "/dev/urandom",
 				MaxBytes: 1024,
@@ -276,8 +271,17 @@ func TestRng0(t *testing.T) {
 			},
 		},
 		{
-			name:          "zero Period, error",
+			name:          "negative Period, error",
 			expectFailure: true,
+			rng_config: rng0Config{
+				Source:   "/dev/urandom",
+				MaxBytes: 1024,
+				Period:   -10,
+			},
+		},
+		{
+			name:          "zero Period, noerror",
+			expectFailure: false,
 			rng_config: rng0Config{
 				Source:   "/dev/urandom",
 				MaxBytes: 1024,
@@ -307,7 +311,7 @@ func TestRng0(t *testing.T) {
 	for _, tt := range Rng0Test {
 		t.Run(tt.name, func(t *testing.T) {
 			cfg := mandatoryConfig(t)
-			cfg["rng0"] = tt.rng_config
+			cfg["rng0"] = &tt.rng_config
 
 			var c Config
 			_, _, err := c.Prepare(&c, cfg)
